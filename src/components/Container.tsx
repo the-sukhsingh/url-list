@@ -24,11 +24,8 @@ const Container = ({children, className}:{
   }
 
   return (
-    <div className={cn("w-full h-full max-w-6xl mx-auto px-4 relative", className)}>
-      <motion.div variants={borderVariant} initial="initial" animate="animate" className='h-full min-h-screen w-px bg-gradient-to-b from-transparent via-primary to-transparent absolute -left-4'>
-      </motion.div>
-      <motion.div variants={borderVariant} initial="initial" animate="animate" className='h-full min-h-screen w-px bg-gradient-to-b from-transparent via-primary to-transparent absolute -right-4'>
-      </motion.div>
+    <div className={cn("w-full h-full min-h-screen max-w-6xl mx-auto px-4 relative", className)}>
+
       {children}
     </div>
   )

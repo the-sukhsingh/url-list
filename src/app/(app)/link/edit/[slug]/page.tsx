@@ -4,10 +4,28 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { UrlPreviewEdit } from '@/components/UrlPreviewEdit';
-import Container from '@/components/Container';
 import { Draggable } from "react-drag-reorder";
 import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import { 
+  ArrowLeft, 
+  Plus, 
+  Save, 
+  Eye, 
+  Trash2, 
+  GripVertical, 
+  Link2,
+  Globe,
+  Loader2,
+  AlertCircle,
+  Sparkles,
+  ExternalLink,
+  Copy,
+  FileText,
+  CheckCircle,
+  Info
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+
 interface LinkType {
   _id: string;
   urls: string[];
@@ -18,7 +36,6 @@ interface LinkType {
   createdAt: string;
   updatedAt: string;
 }
-
 
 interface UrlData {
   url: string;
@@ -44,7 +61,6 @@ const EditLinkPage = () => {
     viewType: "public"
   });
 
-
   const [urlData, setUrlData] = useState<UrlData[]>([]);
   const [urlInput, setUrlInput] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -58,7 +74,6 @@ const EditLinkPage = () => {
 
   const fetchMetadata = async (urlDataArray: UrlData[]) => {
     if (!urlDataArray || urlDataArray.length === 0) return;
-
 
     // Map each urlData to a fetch promise
     await Promise.all(
@@ -150,7 +165,6 @@ const EditLinkPage = () => {
         }
       })
     );
-
   };
 
   useEffect(() => {
@@ -212,7 +226,6 @@ const EditLinkPage = () => {
     }
   }, [slug, status, router]);
 
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -243,7 +256,6 @@ const EditLinkPage = () => {
       setAutoSaving(false);
     }
   };
-
 
   const handleUrlInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     // Add url on Enter and CTRL+Enter
@@ -277,7 +289,6 @@ const EditLinkPage = () => {
         domain: undefined
       };
 
-      
       // Update both states immediately
       setFormData(prev => ({ ...prev, urls: newUrls }));
       setUrlData(prev => {
@@ -289,7 +300,6 @@ const EditLinkPage = () => {
       
       // Wait a bit for state to settle, then fetch metadata
       setTimeout(async () => {
-        
         // Fetch metadata for the new URL with better error handling
         try {
           const urlObj = new URL(trimmedUrl);
@@ -416,7 +426,6 @@ const EditLinkPage = () => {
     
     const updatedUrls = formData.urls.filter(u => u !== url);
     const updatedUrlData = urlData.filter(data => data.url !== url);
-    
     
     // Update both states immediately
     setFormData(prev => ({ ...prev, urls: updatedUrls }));
@@ -545,327 +554,396 @@ const EditLinkPage = () => {
 
   if (status === 'loading' || loading) {
     return (
-      <div className="min-h-screen  pt-16 px-4 flex flex-col items-center justify-center">
-        <div className="relative">
-          <div className="w-16 h-16 rounded-full border-4 border-blue-200 border-t-blue-500 animate-spin"></div>
-          <div className="absolute inset-0 w-16 h-16 rounded-full border-4 border-purple-200 border-b-purple-500 animate-spin animate-reverse"></div>
+      <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+        {/* Grid Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100">
+          <div 
+            className="absolute inset-0 opacity-20"
+            style={{
+              backgroundImage: `
+                linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px)
+              `,
+              backgroundSize: '20px 20px'
+            }}
+          />
         </div>
-        <p className="mt-6 text-gray-600 font-medium">Loading your link...</p>
-        <div className="mt-2 flex space-x-1">
-          <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
-          <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-          <div className="w-2 h-2 bg-pink-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-        </div>
+        
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-white rounded-3xl shadow-xl border border-gray-200 p-8 relative z-10"
+        >
+          {/* Decorative elements */}
+          <div className="absolute top-4 left-4 w-3 h-3 bg-red-400 rounded-full"></div>
+          <div className="absolute top-4 left-12 w-3 h-3 bg-yellow-400 rounded-full"></div>
+          <div className="absolute top-4 left-20 w-3 h-3 bg-green-400 rounded-full"></div>
+          
+          <div className="flex flex-col items-center mt-4">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+              className="w-12 h-12 rounded-full border-4 border-blue-500 border-t-transparent mb-4"
+            />
+            <p className="text-gray-600 font-medium">Loading your collection...</p>
+            <div className="mt-2 flex space-x-1">
+              <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
+              <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+              <div className="w-2 h-2 bg-pink-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+            </div>
+          </div>
+        </motion.div>
       </div>
     );
   }
 
-  // Debug log for current state
-
   return (
-    <Container className="min-h-screen px-4">
-      {/* Decorative background elements */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-200/30 to-purple-200/30 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-pink-200/30 to-blue-200/30 rounded-full blur-3xl"></div>
+    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/10 to-purple-400/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-indigo-400/10 to-pink-400/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-purple-400/5 to-blue-400/5 rounded-full blur-3xl animate-pulse delay-500"></div>
       </div>
 
-      <div className="max-w-4xl mx-auto relative">
+      {/* Back to Dashboard */}
+      <div className="relative z-10 p-4 lg:p-8">
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+        >
+          <Link 
+            href="/dashboard"
+            className="inline-flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 bg-white/60 backdrop-blur-sm border border-white/40 rounded-xl hover:bg-white/80 transition-all duration-300 shadow-sm hover:shadow-md group mb-6"
+          >
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+            <span className="font-medium">Back to Dashboard</span>
+          </Link>
+        </motion.div>
 
+        <div className="max-w-6xl mx-auto">
+          {/* Header Card */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white/80 backdrop-blur-xl border border-white/40 rounded-3xl shadow-2xl p-8 mb-8 relative overflow-hidden"
+          >
+            {/* Gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-purple-500/5 to-pink-500/5"></div>
+            
+            {/* Decorative elements */}
+            <div className="absolute top-4 left-4 w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
+            <div className="absolute top-4 left-12 w-3 h-3 bg-purple-500 rounded-full animate-pulse delay-300"></div>
+            <div className="absolute top-4 left-20 w-3 h-3 bg-pink-500 rounded-full animate-pulse delay-600"></div>
 
-
-        <div className="bg-transparent backdrop-blur-sm overflow-hidden">
-          {/* Header */}
-          <div className="p-8">
-            {status === 'authenticated' && (
-              <>
-                <div className="flex items-center justify-between mb-6">
-                  <Link
-                    href="/dashboard"
-                    className="inline-flex items-center px-4 py-2 text-sm font-medium text-indigo-600 hover:text-indigo-800 backdrop-blur-sm border border-white/20 hover:bg-white/80 transition-all duration-200 shadow-sm hover:shadow-md"
+            <div className="relative flex flex-col lg:flex-row lg:justify-between lg:items-center mt-4">
+              <div>
+                <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
+                  Edit Collection
+                </h1>
+                <div className="flex items-center space-x-2 mb-2">
+                  <span className="text-xl font-semibold text-gray-700">/{slug}</span>
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                    className="w-6 h-6 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center"
                   >
-                    <ArrowLeft className="h-4 w-4 mr-2" />
-                    Back to Dashboard
-                  </Link>
-
+                    <Sparkles className="w-3 h-3 text-white" />
+                  </motion.div>
                 </div>
-              </>
-            )
-            }
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                    </svg>
-                  </div>
-                  <div>
-                    <div className="text-gray-50 text-xl font-semibold">
-                      {formData.title ? formData.title : <span className="text-gray-400 text-lg">Untitled Collection</span>}
-                    </div>
-                    <div className="text-gray-500 text-sm font-mono bg-gray-100 px-2 py-1 rounded-md inline-block mt-1">
-                      {slug ? `/${slug}` : <span className="text-gray-400">No slug</span>}
-                    </div>
-                  </div>
-                </div>
+                <p className="text-gray-600">
+                  Create and manage your curated link collection
+                </p>
               </div>
 
-              <div className="flex items-center space-x-3">
-                <div className="flex items-center space-x-3 bg-white/70 rounded-full px-4 py-2 border border-gray-200">
-                  <span className="text-gray-600 text-sm font-medium">Private</span>
-                  <button
-                    type="button"
-                    onClick={() => setFormData(prev => ({ ...prev, viewType: prev.viewType === 'private' ? 'public' : 'private' }))}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-300 ${formData.viewType === 'public'
-                      ? 'bg-gradient-to-r from-green-400 to-blue-500 shadow-lg'
-                      : 'bg-gray-300'
-                      }`}
-                  >
-                    <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-300 shadow-md ${formData.viewType === 'public' ? 'translate-x-6' : 'translate-x-1'
-                        }`}
-                    />
-                  </button>
-                  <span className="text-gray-600 text-sm font-medium">Public</span>
-                </div>
-              </div>
-            </div>
-
-          </div>
-          <div className="h-px w-full bg-gradient-to-r from-transparent via-primary to-transparent pointer-events-none" />
-
-          <form onSubmit={handleSubmit} className="p-8 space-y-8">
-            {error && (
-              <div className="bg-red-50 border border-red-200 p-4 flex items-center space-x-3">
-                <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
-                  <svg className="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <p className="text-sm text-red-700 font-medium">{error}</p>
-              </div>
-            )}
-
-            {/* Description with creative styling */}
-            <div className="space-y-3">
-              <label className="flex items-center space-x-2 text-gray-100 font-medium">
-                <div className="w-5 h-5 bg-gradient-to-br from-purple-400 to-pink-500 rounded-md flex items-center justify-center">
-                  <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
-                  </svg>
-                </div>
-                <span>Collection Description</span>
-              </label>
-              <div className="relative">
-                <textarea
-                  name="description"
-                  id="description"
-                  rows={2}
-                  className="block w-full px-4 py-4 text-gray-50 bg-transparent border border-gray-200 placeholder-gray-500 resize-none transition-all duration-200 backdrop-blur-sm shadow-sm"
-                  placeholder="Tell your audience what this collection is about... ✨"
-                  value={formData.description}
-                  spellCheck="false"
-                  maxLength={200}
-                  onChange={handleInputChange}
-                />
-                <div className="absolute bottom-3 right-3 text-xs text-gray-400">
-                  {formData.description.length}/200
-                </div>
-              </div>
-            </div>
-
-            {/* URL Input with enhanced design */}
-            <div className="space-y-3">
-              <label className="flex items-center space-x-2 text-gray-50 font-medium">
-                <div className="w-5 h-5 bg-gradient-to-br from-blue-400 to-purple-500 rounded-md flex items-center justify-center">
-                  <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                </div>
-                <span>Add New Link</span>
-              </label>
-              <div className="flex space-x-3">
-                <div className="flex-1 relative">
-                  <input
-                    type="url"
-                    value={urlInput}
-                    onChange={(e) => setUrlInput(e.target.value)}
-                    onKeyDown={handleUrlInputKeyDown}
-                    placeholder="https://example.com - Paste your link here"
-                    className="w-full px-4 py-4 text-gray-50 bg-transparent border border-gray-200 placeholder-gray-400 transition-all duration-200 backdrop-blur-sm shadow-sm pr-12"
-                  />
-                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                    <div className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center">
-                      <svg className="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    addUrl();
-                  }}
-                  disabled={!urlInput.trim()}
-                  className="px-8 py-4 bg-primary text-white font-medium  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-neutral-400 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl cursor-pointer disabled:transform-none"
+              <div className="flex items-center space-x-4 mt-6 lg:mt-0">
+                <Link
+                  href={`/${slug}`}
+                  target="_blank"
+                  className="inline-flex items-center gap-2 px-6 py-3 text-blue-600 bg-blue-50 border border-blue-200 rounded-xl hover:bg-blue-100 hover:border-blue-300 transition-all duration-300 shadow-sm hover:shadow-md"
                 >
-                  <span className="flex items-center space-x-2">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                    <span>Add Link</span>
-                  </span>
-                </button>
+                  <ExternalLink className="w-4 h-4" />
+                  <span className="font-medium">Preview</span>
+                </Link>
+
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => {
+                    navigator.clipboard.writeText(`${window.location.origin}/${slug}`);
+                  }}
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl hover:from-purple-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl"
+                >
+                  <Copy className="w-4 h-4" />
+                  <span className="font-medium">Copy Link</span>
+                </motion.button>
               </div>
             </div>
+          </motion.div>
 
-            {/* URL Previews with creative design */}
-            <div className="space-y-4">
-              {urlData.length > 0 && (
-                <div className="flex items-center space-x-2 mb-4 ">
-                  <div className="w-5 h-5 bg-gradient-to-br from-green-400 to-blue-500 rounded-md flex items-center justify-center">
-                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+          {/* Main Content Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Left Column - Form */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.1 }}
+              className="lg:col-span-1"
+            >
+              <div className="bg-white/80 backdrop-blur-xl border border-white/40 rounded-3xl shadow-2xl p-6 sticky top-8">
+                <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                  <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center mr-3">
+                    <Plus className="w-4 h-4 text-white" />
                   </div>
-                  <span className="text-white font-medium">Your Links ({urlData.length})</span>
-                </div>
-              )}
-              <Draggable key={`draggable-${renderKey}`} onPosChange={getChangedPos}>
-                {urlData.map((data, index) => {
-                  return (
-                    <div key={`url-${data.url}-${index}-${urlData.length}`} className="group relative bg-transparent mb-4 p-1 backdrop-blur-sm hover:shadow-lg transition-all duration-300 border">
-                      <div className="flex items-start justify-between w-full relative">
+                  Add & Manage
+                </h2>
 
-                        <div className="flex-1 w-full">
-                          <div className="flex items-center space-x-3 mb-3">
-                            <div className="text-sm text-gray-500 font-mono bg-gray-100 px-2 py-1">
-                              Link #{index + 1}
-                            </div>
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  {error && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center space-x-3"
+                    >
+                      <AlertCircle className="w-5 h-5 text-red-500" />
+                      <p className="text-sm text-red-700 font-medium">{error}</p>
+                    </motion.div>
+                  )}
+
+                  {/* Description */}
+                  <div className="space-y-3">
+                    <label className="flex items-center space-x-2 text-gray-700 font-semibold">
+                      <FileText className="w-5 h-5 text-purple-500" />
+                      <span>Collection Description</span>
+                    </label>
+                    <div className="relative">
+                      <textarea
+                        name="description"
+                        rows={3}
+                        className="block w-full px-4 py-4 text-gray-900 bg-gray-50 border-2 border-gray-200 rounded-xl placeholder-gray-500 resize-none transition-all duration-200 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:bg-white"
+                        placeholder="Describe what this collection is about... ✨"
+                        value={formData.description}
+                        maxLength={200}
+                        onChange={handleInputChange}
+                      />
+                      <div className="absolute bottom-3 right-3 text-xs text-gray-400 bg-white px-2 py-1 rounded-lg">
+                        {formData.description.length}/200
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* URL Input */}
+                  <div className="space-y-3">
+                    <label className="flex items-center space-x-2 text-gray-700 font-semibold">
+                      <Link2 className="w-5 h-5 text-blue-500" />
+                      <span>Add New Link</span>
+                    </label>
+                    <div className="space-y-3">
+                      <div className="relative">
+                        <input
+                          type="url"
+                          value={urlInput}
+                          onChange={(e) => setUrlInput(e.target.value)}
+                          onKeyDown={handleUrlInputKeyDown}
+                          placeholder="https://example.com"
+                          className="w-full px-4 py-4 text-gray-900 bg-gray-50 border-2 border-gray-200 rounded-xl placeholder-gray-400 transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white pr-12"
+                        />
+                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                          <Link2 className="w-5 h-5 text-gray-400" />
+                        </div>
+                      </div>
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          addUrl();
+                        }}
+                        disabled={!urlInput.trim()}
+                        className="w-full px-6 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:transform-none"
+                      >
+                        <span className="flex items-center justify-center space-x-2">
+                          <Plus className="w-5 h-5" />
+                          <span>Add to Collection</span>
+                        </span>
+                      </motion.button>
+                    </div>
+                  </div>
+
+                  {/* Stats */}
+                  <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <CheckCircle className="w-5 h-5 text-green-500" />
+                        <span className="text-sm font-semibold text-gray-700">
+                          {urlData.length} link{urlData.length !== 1 ? 's' : ''} added
+                        </span>
+                      </div>
+                      {urlData.length > 0 && (
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          type="submit"
+                          disabled={isSubmitting}
+                          className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-medium rounded-lg text-sm shadow-md hover:shadow-lg transition-all duration-200"
+                        >
+                          {isSubmitting ? (
+                            <span className="flex items-center space-x-1">
+                              <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin"></div>
+                              <span>Saving...</span>
+                            </span>
+                          ) : (
+                            <span className="flex items-center space-x-1">
+                              <Save className="w-3 h-3" />
+                              <span>Save</span>
+                            </span>
+                          )}
+                        </motion.button>
+                      )}
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </motion.div>
+
+            {/* Right Column - URL Previews */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 }}
+              className="lg:col-span-2"
+            >
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-bold text-gray-800 flex items-center">
+                    <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center mr-3">
+                      <CheckCircle className="w-4 h-4 text-white" />
+                    </div>
+                    Your Collection ({urlData.length})
+                  </h2>
+                  {urlData.length > 1 && (
+                    <div className="text-sm text-gray-500 bg-white/60 px-3 py-1 rounded-lg">
+                      Drag to reorder
+                    </div>
+                  )}
+                </div>
+
+                {urlData.length > 0 ? (
+                  <Draggable key={`draggable-${renderKey}`} onPosChange={getChangedPos}>
+                    {urlData.map((data, index) => (
+                      <motion.div
+                        key={`url-${data.url}-${index}-${urlData.length}`}
+                        initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        transition={{ delay: index * 0.1 }}
+                        className="group relative"
+                      >
+                        {/* Position indicator */}
+                        <div className="absolute -left-4 top-6 z-10">
+                          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 text-white text-sm font-bold flex items-center justify-center rounded-xl shadow-lg group-hover:scale-110 transition-transform">
+                            {index + 1}
                           </div>
+                        </div>
+
+                        {/* Delete button */}
+                        <motion.button
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          type="button"
+                          onClick={() => removeUrl(data.url)}
+                          className="absolute -right-4 top-6 z-10 w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-xl shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center justify-center"
+                          title="Remove this link"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </motion.button>
+
+                        {/* URL Preview */}
+                        <div className="pl-8 pr-8">
                           <UrlPreviewEdit
                             key={`preview-${data.url}-${data.loading}-${data.title || 'no-title'}`}
                             urlData={data}
                             index={index}
                             onMetadataUpdate={handleMetadataUpdate}
-                            className='w-full'
+                            className="w-full transform group-hover:scale-[1.02] transition-transform duration-300"
                           />
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => removeUrl(data.url)}
-                          className="opacity-0 group-hover:opacity-100 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all duration-200 absolute top-0 right-0 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-                          title="Remove this link"
-                        >
-                          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                        </button>
-                      </div>
+                      </motion.div>
+                    ))}
+                  </Draggable>
+                ) : (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="text-center py-20 bg-white/60 backdrop-blur-sm border-2 border-dashed border-gray-200 rounded-3xl"
+                  >
+                    <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center">
+                      <Link2 className="w-12 h-12 text-gray-400" />
                     </div>
-                  );
-                })}
-              </Draggable>
-
-              {urlData.length === 0 && (
-                <div className="text-center py-16 border-2 border-dashed border-gray-300">
-                  <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center">
-                    <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                    </svg>
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-100 mb-2">No links yet</h3>
-                  <p className="text-gray-500 mb-4">Start building your collection by adding your first link above</p>
-                  <div className="flex items-center justify-center space-x-2 text-sm text-gray-400">
-                    <span>💡</span>
-                    <span>Tip: You can add multiple links to create a curated collection</span>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Creative footer with action buttons */}
-            <div className="px-8 py-6 flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                {urlData.length > 0 && (
-                  <div className="flex items-center space-x-2 text-sm text-gray-100">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span>{urlData.length} link{urlData.length !== 1 ? 's' : ''} added</span>
-                  </div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">Start Building Your Collection</h3>
+                    <p className="text-gray-500 mb-6 max-w-md mx-auto">Add your first link to begin creating an amazing curated collection that you can share with others.</p>
+                    <div className="flex items-center justify-center space-x-2 text-sm text-gray-400">
+                      <Sparkles className="w-4 h-4" />
+                      <span>Tip: You can drag and drop to reorder links</span>
+                    </div>
+                  </motion.div>
                 )}
               </div>
-
-              <div className="flex items-center space-x-3">
-
-                <button
-                  type="submit"
-                  disabled={isSubmitting || formData.urls.length === 0}
-                  className="px-8 py-3 bg-primary text-white font-medium cursor-pointer focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:transform-none"
-                >
-                  {isSubmitting ? (
-                    <span className="flex items-center space-x-2">
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      <span>Saving...</span>
-                    </span>
-                  ) : (
-                    <span className="flex items-center space-x-2">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      <span>Save & View</span>
-                    </span>
-                  )}
-                </button>
-              </div>
-            </div>
-          </form>
-        </div>
-
-        {/* Creative floating help card */}
-        {urlData.length === 0 && (
-          <div className="mt-8 bg-white/80 backdrop-blur-sm border border-white/20 shadow-lg p-6">
-            <div className="flex items-start space-x-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-800 mb-2">Getting Started</h3>
-                <ul className="text-sm text-gray-600 space-y-1">
-                  <li>• Add links to articles, videos, or any web content</li>
-                  <li>• Write a description to give context to your collection</li>
-                  <li>• Choose between public or private visibility</li>
-                  <li>• Share your custom URL with others</li>
-                </ul>
-              </div>
-            </div>
+            </motion.div>
           </div>
-        )}
-      </div>
-      <footer className="py-4">
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-gray-400 text-sm mt-2">
-          <span>
-            Made with <span className="text-pink-500">❤️</span> by&nbsp;
-            <a
-              href="https://x.com/thesukhjitbajwa"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline hover:text-indigo-500 transition"
+
+          {/* Help Section */}
+          {urlData.length === 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="mt-8 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-3xl p-8"
             >
-              Sukhjit Singh
-            </a>
-          </span>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="text-center">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+                    <Plus className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="font-bold text-gray-800 mb-2">Add Links</h3>
+                  <p className="text-sm text-gray-600">Paste any URL to add articles, videos, or resources to your collection.</p>
+                </div>
+                <div className="text-center">
+                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+                    <GripVertical className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="font-bold text-gray-800 mb-2">Organize</h3>
+                  <p className="text-sm text-gray-600">Drag and drop to reorder your links in the perfect sequence.</p>
+                </div>
+                <div className="text-center">
+                  <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-pink-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+                    <ExternalLink className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="font-bold text-gray-800 mb-2">Share</h3>
+                  <p className="text-sm text-gray-600">Copy your custom URL and share your curated collection with anyone.</p>
+                </div>
+              </div>
+            </motion.div>
+          )}
         </div>
-      </footer>
-    </Container>
-    
+
+        <footer className="py-8 mt-16">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-gray-400 text-sm">
+            <span>
+              Made with <span className="text-pink-500">❤️</span> by&nbsp;
+              <a
+                href="https://x.com/thesukhjitbajwa"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-indigo-500 transition"
+              >
+                Sukhjit Singh
+              </a>
+            </span>
+          </div>
+        </footer>
+      </div>
+    </div>
   );
 };
 

@@ -46,13 +46,13 @@ export const UrlPreviewEdit = ({ urlData, index, onMetadataUpdate, className = '
 
   if (urlData.loading) {
     return (
-      <div className={`relative w-full border border-gray-100 backdrop-blur-sm p-4 ${className}`}>
+      <div className={`relative w-full bg-white rounded-2xl border border-gray-200 p-4 shadow-sm ${className}`}>
         <div className="animate-pulse">
           <div className="flex items-center space-x-3 mb-3">
-            <div className="h-6 w-6 rounded-full bg-gray-200"></div>
+            <div className="h-8 w-8 rounded-xl bg-gray-200"></div>
             <div className="flex-1 space-y-2">
-              <div className="h-3 w-24 rounded-full bg-gray-200"></div>
-              <div className="h-2 w-32 rounded-full bg-gray-100"></div>
+              <div className="h-4 w-24 rounded-full bg-gray-200"></div>
+              <div className="h-3 w-32 rounded-full bg-gray-100"></div>
             </div>
           </div>
           <div className="space-y-2">
@@ -67,10 +67,15 @@ export const UrlPreviewEdit = ({ urlData, index, onMetadataUpdate, className = '
 
   if (urlData.error) {
     return (
-      <div className={`relative border border-red-100 bg-red-50/50 p-4 ${className}`}>
-        <div className="flex items-center space-x-2 text-red-500">
-          <Globe className="h-4 w-4" />
-          <span className="text-sm">{urlData.error}</span>
+      <div className={`relative bg-red-50 rounded-2xl border border-red-200 p-4 shadow-sm ${className}`}>
+        <div className="flex items-center space-x-3">
+          <div className="w-8 h-8 bg-red-100 rounded-xl flex items-center justify-center">
+            <Globe className="h-4 w-4 text-red-500" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-red-700">Failed to load preview</p>
+            <p className="text-xs text-red-600">{urlData.error}</p>
+          </div>
         </div>
       </div>
     );
@@ -85,21 +90,21 @@ export const UrlPreviewEdit = ({ urlData, index, onMetadataUpdate, className = '
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
-      className={`group relative block w-full backdrop-blur-sm p-3 transition-all duration-200 hover:shadow-sm ${className}`}
+      className={`group relative block w-full bg-white rounded-2xl border border-gray-200 p-4 shadow-sm hover:shadow-xl hover:border-blue-200 transition-all duration-200 ${className}`}
     >
-      {/* Subtle gradient background */}
-      {/* <div className="absolute inset-0 bg-gradient-to-br from-gray-50/50 to-transparent opacity-0 transition-opacity duration-200 group-hover:opacity-100"></div> */}
+      {/* Subtle gradient background on hover */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-purple-50/50 opacity-0 transition-opacity duration-200 group-hover:opacity-100 rounded-2xl"></div>
 
       <div className="relative">
         {/* Header */}
-        <div className="flex items-center justify-between mb-1">
-          <div className="flex items-center space-x-2.5">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center space-x-3">
             {urlData.favicon && !imageError ? (
               <div className="relative">
                 <Image
                   src={urlData.favicon}
                   alt=""
-                  className="h-5 w-5 rounded-sm"
+                  className="h-8 w-8 rounded-xl shadow-sm"
                   onError={() => {
                     // Try Google's favicon service as fallback
                     const fallbackFavicon = `https://www.google.com/s2/favicons?domain=${urlData.domain}&sz=32`;
@@ -109,19 +114,22 @@ export const UrlPreviewEdit = ({ urlData, index, onMetadataUpdate, className = '
                       setImageError(true);
                     }
                   }}
-                  width={20}
-                  height={20}
+                  width={32}
+                  height={32}
                 />
               </div>
             ) : (
-              <div className="flex h-5 w-5 items-center justify-center rounded-sm bg-gray-100">
-                <Globe className="h-3 w-3 text-gray-400" />
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-blue-100 to-purple-100">
+                <Globe className="h-4 w-4 text-blue-600" />
               </div>
             )}
 
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-medium text-gray-50 truncate">
+              <p className="text-sm font-semibold text-gray-700 truncate">
                 {urlData.domain}
+              </p>
+              <p className="text-xs text-gray-500">
+                {urlData.siteName || 'Website'}
               </p>
             </div>
           </div>
@@ -129,28 +137,35 @@ export const UrlPreviewEdit = ({ urlData, index, onMetadataUpdate, className = '
           <motion.div
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-50 text-gray-400 transition-colors group-hover:bg-gray-100 group-hover:text-gray-600"
+            className="flex h-8 w-8 items-center justify-center rounded-xl bg-gray-50 text-gray-400 transition-colors group-hover:bg-blue-50 group-hover:text-blue-600"
           >
-            <ArrowUpRight className="h-3 w-3" />
+            <ArrowUpRight className="h-4 w-4" />
           </motion.div>
         </div>
 
         {/* Content */}
         <div className="space-y-2">
-          <h3 className="text-lg font-semibold text-gray-100 line-clamp-2 leading-snug">
+          <h3 className="text-base font-semibold text-gray-900 line-clamp-2 leading-snug">
             <span dangerouslySetInnerHTML={{ __html: urlData.title || urlData.domain || 'Loading...' }} />
           </h3>
 
           {urlData.description && (
-            <p className="text-xs text-neutral-200 line-clamp-2 leading-relaxed">
+            <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">
               <span dangerouslySetInnerHTML={{ __html: urlData.description }} />
             </p>
           )}
+
+          {/* URL display */}
+          <div className="pt-2 border-t border-gray-100">
+            <p className="text-xs text-gray-500 truncate font-mono">
+              {urlData.url}
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Subtle hover indicator */}
-      {/* <div className="absolute inset-0  ring-1 ring-gray-200/50 opacity-0 transition-opacity duration-200 group-hover:opacity-100"></div> */}
+      {/* Subtle hover indicator border */}
+      <div className="absolute inset-0 rounded-2xl ring-1 ring-blue-200/50 opacity-0 transition-opacity duration-200 group-hover:opacity-100"></div>
     </motion.a>
   );
 };

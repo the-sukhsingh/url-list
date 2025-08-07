@@ -4,8 +4,24 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { UrlPreview } from '@/components/UrlPreview';
-import { Copy, ArrowLeft, Edit3, Calendar, Link2, Sparkles, Zap } from 'lucide-react';
-import { motion } from 'motion/react';
+import { 
+  Copy, 
+  ArrowLeft, 
+  Edit3, 
+  Calendar, 
+  Link2, 
+  Sparkles, 
+  Zap, 
+  Share,
+  Eye,
+  Heart,
+  Star,
+  Globe,
+  Clock,
+  Users,
+  ExternalLink
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { useSession } from 'next-auth/react';
 
 interface LinkType {
@@ -78,38 +94,52 @@ const LinkPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-10 h-10 rounded-full border-3 border-gradient-to-r border-t-transparent animate-spin mx-auto bg-gradient-to-r from-purple-500 to-blue-500 p-0.5">
-            <div className="w-full h-full rounded-full bg-white"></div>
-          </div>
-          <p className="mt-4 text-sm font-medium bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">Loading your collection...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-center"
+        >
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+            className="w-8 h-8 border-2 border-gray-300 border-t-blue-500 rounded-full mx-auto mb-4"
+          />
+          <p className="text-gray-600">Loading collection...</p>
+        </motion.div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4">
+      <div className="min-h-screen flex items-center justify-center px-4 bg-gray-50">
         <motion.div
-          initial={{ opacity: 0, y: 20, scale: 0.9 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          className="max-w-md w-full bg-white/90 backdrop-blur-xl border border-white/20 p-8 text-center shadow-2xl"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-md w-full text-center"
         >
-          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-red-400 to-pink-500 flex items-center justify-center mx-auto shadow-lg">
-            <Link2 className="h-8 w-8 text-white" />
+          <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-200">
+            <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-6">
+              <Link2 className="h-8 w-8 text-red-600" />
+            </div>
+            
+            <h1 className="text-xl font-semibold text-gray-900 mb-4">
+              {error}
+            </h1>
+            
+            <p className="text-gray-600 mb-8">
+              The link you're looking for might have been moved or doesn't exist.
+            </p>
+            
+            <button
+              onClick={() => router.push('/dashboard')}
+              className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Go to Dashboard
+            </button>
           </div>
-          <h1 className="mt-6 text-xl font-bold bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent">{error}</h1>
-          <p className="mt-3 text-sm text-gray-600">
-            The link you're looking for might have been moved or doesn't exist.
-          </p>
-          <button
-            onClick={() => router.push('/dashboard')}
-            className="mt-8 inline-flex items-center px-6 py-3 text-sm font-semibold bg-gradient-to-r from-red-500 to-pink-500 text-white hover:from-red-600 hover:to-pink-600 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
-          >
-            Go to Dashboard
-          </button>
         </motion.div>
       </div>
     );
@@ -120,230 +150,137 @@ const LinkPage = () => {
   }
 
   return (
-    <div className="min-h-screen px-4 relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-purple-400/20 to-pink-400/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-indigo-400/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-      </div>
-
-      <div className="max-w-4xl pt-10 mx-auto relative">
-        {/* Header */}
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
-        >
-          {status === 'authenticated' && user?.id === link.userId && (
-            <>
-              <div className="flex items-center justify-between mb-6">
-                <Link
-                  href="/dashboard"
-                  className="inline-flex items-center px-4 py-2 text-sm font-medium text-indigo-600 hover:text-indigo-800 backdrop-blur-sm border border-white/20 hover:bg-white/80 transition-all duration-200 shadow-sm hover:shadow-md"
-                >
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back to Dashboard
-                </Link>
-
-                <button
-                  onClick={() => router.push(`/link/edit/${link.slug}`)}
-                  className="inline-flex items-center px-4 py-2 text-sm font-medium text-purple-600 hover:text-purple-800 backdrop-blur-sm border border-white/20 hover:bg-white/80 transition-all duration-200 shadow-sm hover:shadow-md"
-                >
-                  <Edit3 className="h-4 w-4 mr-2" />
-                  Edit Collection
-                </button>
-              </div>
-            </>
-          )
-          }
-
-
-          <div className="bg-transparent backdrop-blur-xl relative overflow-hidden">
-            {/* Gradient overlay */}
-            {/* <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-purple-500/5 to-pink-500/5"></div> */}
-
-            <div className="relative">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center space-x-4 mb-4">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center shadow-lg">
-                        <Sparkles className="h-6 w-6 text-white" />
-                      </div>
-                      <div>
-                        <h1 className="text-3xl font-bold bg-primary bg-clip-text text-transparent">
-                          {link.title}
-                        </h1>
-                        <h2>
-                          <span className="text-gray-100 text-sm">Collection</span> - /{link.slug}
-                        </h2>
-                      </div>
-                    </div>
-
-                    <motion.button
-                      onClick={() => copyToClipboard(`${window.location.origin}/${link.slug}`)}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="p-2 bg-primary text-white transition-all duration-200 shadow-lg hover:shadow-xl"
-                      title="Copy link to clipboard"
-                    >
-                      {copiedUrl === `${window.location.origin}/${link.slug}` ? (
-                        <motion.div
-                          initial={{ scale: 0.8, rotate: -180 }}
-                          animate={{ scale: 1, rotate: 0,  }}
-                          className="h-4 w-4 relative -top-1"
-                        >
-                          ✓
-                        </motion.div>
-                      ) : (
-                        <Copy className="h-4 w-4" />
-                      )}
-                    </motion.button>
-                  </div>
-
-                  {link.description && (
-                    <p className="text-gray-200 mb-4 text-lg leading-relaxed">{link.description}</p>
-                  )}
-
-                  <div className="flex items-center space-x-6 text-sm">
-                    <div className="flex items-center space-x-2 px-3 py-1.5 bg-base-300 rounded-full">
-                      <Calendar className="h-4 w-4 text-indigo-500" />
-                      <span className="text-gray-300 font-medium">Created {new Date(link.createdAt).toLocaleDateString()}</span>
-                    </div>
-                    <div className="flex items-center space-x-2 px-3 py-1.5 bg-base-300 rounded-full">
-                      <Zap className="h-4 w-4 text-purple-500" />
-                      <span className="text-gray-300 font-medium">{link.urls.length} {link.urls.length === 1 ? 'link' : 'links'}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white border-b border-gray-200">
+        <div className="max-w-4xl mx-auto px-4 py-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">{link.title || link.slug}</h1>
+              {link.description && (
+                <p className="text-gray-600 mt-1">{link.description}</p>
+              )}
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium">
+                {link.urls.length} {link.urls.length === 1 ? 'link' : 'links'}
+              </span>
+              
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => copyToClipboard(`${window.location.origin}/${link.slug}`)}
+                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                {copiedUrl === `${window.location.origin}/${link.slug}` ? (
+                  <>
+                    <span className="text-green-300 mr-2">✓</span>
+                    Copied!
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-4 h-4 mr-2" />
+                    Copy Link
+                  </>
+                )}
+              </motion.button>
+              
+              {status === 'authenticated' && user?.id === link.userId && (
+                <>
+                  <button
+                    onClick={() => router.push(`/link/edit/${link.slug}`)}
+                    className="inline-flex items-center px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+                  >
+                    <Edit3 className="w-4 h-4 mr-2" />
+                    Edit
+                  </button>
+                  <Link href="/dashboard" className="p-2 text-gray-600 hover:text-gray-900 transition-colors">
+                    <ArrowLeft className="w-5 h-5" />
+                  </Link>
+                </>
+              )}
             </div>
           </div>
-        </motion.div>
-        {/* URLs Grid */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="grid gap-6"
-        >
-          {link.urls.map((url, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 30, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{
-                delay: 0.2 + index * 0.1,
-                type: "tween",
-                stiffness: 100,
-                damping: 15
-              }}
-              className="group relative"
-            >
-              {/* Glowing border effect */}
-              <div className="absolute -inset-0.5 rounded-2xl opacity-0 group-hover:opacity-20 transition-opacity duration-300 blur-sm"></div>
+        </div>
+      </header>
 
-              <div className="relative">
-                <UrlPreview url={url} className="transform transition-all duration-300 group-hover:scale-[1.02] group-hover:shadow-2xl" />
-
-                {/* Floating action button */}
+      {/* Main Content */}
+      <main className="max-w-4xl mx-auto p-6">
+        {link.urls.length === 0 ? (
+          <div className="text-center py-16">
+            <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+              <Link2 className="h-8 w-8 text-gray-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">No links yet</h3>
+            <p className="text-gray-600 mb-6">This collection is waiting for its first link.</p>
+            {status === 'authenticated' && user?.id === link.userId && (
+              <button
+                onClick={() => router.push(`/link/edit/${link.slug}`)}
+                className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <Edit3 className="w-4 h-4 mr-2" />
+                Add First Link
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {link.urls.map((url, index) => (
+              <motion.div
+                key={`${url}-${index}`}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="relative group"
+              >
+                <UrlPreview url={url} />
+                
+                {/* Copy button */}
                 <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={(e) => {
                     e.preventDefault();
                     copyToClipboard(url);
                   }}
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  whileTap={{ scale: 0.9 }}
-                  className="absolute -bottom-2 -right-8 w-8 h-8 cursor-pointer bg-accent text-white shadow-lg hover:shadow-xl transition-all duration-200 opacity-0 group-hover:opacity-100 flex items-center justify-center"
+                  className="absolute top-4 right-4 p-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors opacity-0 group-hover:opacity-100"
                   title="Copy URL"
                 >
                   {copiedUrl === url ? (
-                    <motion.div
-                      initial={{ scale: 0.5, rotate: -180 }}
-                      animate={{ scale: 1, rotate: 0 }}
-                      className="text-sm font-bold"
-                    >
-                      ✓
-                    </motion.div>
+                    <span className="text-green-600 text-sm font-medium">✓</span>
                   ) : (
-                    <Copy className="h-4 w-4" />
+                    <Copy className="w-4 h-4 text-gray-600" />
                   )}
                 </motion.button>
 
-                {/* Link number badge */}
-                <div
-                  className={`absolute -top-3 -left-8 w-8 h-8 bg-accent transition-transform duration-200 text-white text-sm font-bold flex items-center justify-center shadow-lg
-                    ${index % 2 === 0 ? 'group-hover:rotate-12' : 'group-hover:-rotate-12'}`}
-                >
+                {/* Index badge */}
+                <div className="absolute top-4 left-4 w-6 h-6 bg-blue-600 text-white text-sm font-medium flex items-center justify-center rounded-full">
                   {index + 1}
                 </div>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
-
-        {/* Empty state */}
-        {link.urls.length === 0 && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.3 }}
-            className="text-center py-16"
-          >
-            <div className="relative mb-8">
-              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center mx-auto shadow-2xl">
-                <Link2 className="h-12 w-12 text-white" />
-              </div>
-              <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-lg animate-bounce">
-                <Sparkles className="h-4 w-4 text-white" />
-              </div>
-            </div>
-            <h3 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-3">Ready to add some magic?</h3>
-            <p className="text-gray-600 mb-8 text-lg">This collection is waiting for your awesome links.</p>
-            <motion.button
-              onClick={() => router.push(`/link/edit/${link.slug}`)}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="inline-flex items-center px-8 py-4 text-lg font-semibold rounded-2xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 transition-all duration-200 shadow-xl hover:shadow-2xl"
-            >
-              <Sparkles className="h-5 w-5 mr-2" />
-              Add Your First Link
-            </motion.button>
-          </motion.div>
+              </motion.div>
+            ))}
+          </div>
         )}
-      </div>
+      </main>
 
       {/* Footer */}
-      <footer className="mt-20 pb-8 px-4 w-full flex flex-col items-center text-center">
-        <div className="w-full max-w-md">
-          {
-            status !== 'authenticated' && (
-
-          <Link
-        href="/sign-up"
-        className="inline-flex items-center justify-center w-full sm:w-auto px-6 py-3 rounded-2xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white font-semibold shadow-xl hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 transition-all duration-200 mb-4 text-base sm:text-lg"
-          >
-        <Sparkles className="h-5 w-5 mr-2" />
-        <span>Build your own URL Wrapper</span>
-          </Link>
-            )
-          }
-        </div>
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-gray-400 text-sm mt-2">
-          <span>
-        Made with <span className="text-pink-500">❤️</span> by&nbsp;
-        <a
-          href="https://x.com/thesukhjitbajwa"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="underline hover:text-indigo-500 transition"
-        >
-          Sukhjit Singh
-        </a>
-          </span>
-        </div>
-      </footer>
+      {status !== 'authenticated' && (
+        <footer className="mt-16 pb-8 px-4">
+          <div className="max-w-md mx-auto text-center">
+            <div className="bg-white rounded-xl p-6 border border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Create Your Own Collection</h3>
+              <p className="text-gray-600 text-sm mb-4">Start curating and sharing your favorite links</p>
+              <Link
+                href="/sign-up"
+                className="inline-flex items-center justify-center w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Get Started Free
+              </Link>
+            </div>
+          </div>
+        </footer>
+      )}
     </div>
   );
 };
