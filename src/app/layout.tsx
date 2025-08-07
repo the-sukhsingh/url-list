@@ -3,6 +3,7 @@ import "./globals.css";
 import AuthProvider from "@/context/AuthProvider";
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://url-list-by-sukh.vercel.app'),
   title: "URL List - Share Multiple Links with One Short URL",
   description: "URL List helps you share multiple links with one easy-to-remember URL. Create custom slugs for your collection of links.",
   icons: {
