@@ -5,8 +5,7 @@ export interface ILink {
     urls: string[];
     title: string;
     slug: string;
-    userId: mongoose.Types.ObjectId ;
-    viewType:  "public" | "private";
+    keyWord: string;
     description?: string;
     createdAt: Date;
     updatedAt: Date;
@@ -16,8 +15,7 @@ const LinkSchema = new mongoose.Schema<ILink>({
     urls: { type: [String], required: true },
     title: { type: String, required: true },
     slug: { type: String, required: true, unique: true },
-    userId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: "User" },
-    viewType: { type: String, enum: ["public", "private"], default: "public" },
+    keyWord: {type: String, required: true, trim: true, minlength: 3, maxlength: 20},
     description: { type: String, default: "" },
 }, {
     timestamps: true,

@@ -122,7 +122,7 @@ function extractMetadata(html: string, url: string) {
         title: title?.substring(0, 200) || domain,
         description: description?.substring(0, 300) || null,
         siteName: siteName?.substring(0, 100) || domain,
-        favicon: `https://www.google.com/s2/favicons?domain=${domain}&sz=32`,
+        favicon: `https://www.google.com/s2/favicons?domain=${domain}&sz=128`,
         domain,
     };
 }

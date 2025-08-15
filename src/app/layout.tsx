@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import AuthProvider from "@/context/AuthProvider";
+import { ThemeProvider } from "next-themes";
+import { ToggleTheme } from "@/components/ThemeChanger";
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://url-list-by-sukh.vercel.app'),
@@ -59,13 +60,19 @@ export default function RootLayout({
         <meta name="url" content="https://url-list-by-sukh.vercel.app/" />
         <link rel="icon" href="/favicon.ico" />
       </head>
-      
-      <body className="min-h-screen selection:bg-accent selection:text-white">
-        <AuthProvider>
 
-          <main>{children}</main>
-        </AuthProvider>
-      </body>
+        <body className="min-h-screen ">
+      <ThemeProvider enableSystem
+        disableTransitionOnChange
+        enableColorScheme
+        storageKey="theme"
+        defaultTheme="system"
+        attribute="class">
+          <ToggleTheme />
+          <main className="selection:bg-black dark:selection:text-black dark:selection:bg-white">
+            {children}</main>
+      </ThemeProvider>
+        </body>
     </html>
   );
 }

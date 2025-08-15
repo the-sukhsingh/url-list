@@ -1,8 +1,5 @@
 import { NextResponse } from "next/server";
-import LinkModel, { ILink } from "../../../model/Link"; // Adjust the import path as necessary
-import { authOptions } from "../auth/[...nextauth]/options";
-import { getServerSession } from "next-auth";
-import UserModel from "@/model/User";
+import LinkModel from "../../../model/Link"; // Adjust the import path as necessary
 import dbConnect from "@/lib/db";
 
 export async function GET(request: Request) {
@@ -18,36 +15,15 @@ export async function GET(request: Request) {
         }
 
         // Find the link by slug
-        const link = await LinkModel.findOne({ slug });
+        let link = await LinkModel.findOne({ slug });
 
         if (!link) {
             return NextResponse.json({ error: "Link not found" }, { status: 404 });
         }
 
-        if(link.viewType === 'public'){
-            return NextResponse.json(link)
-        } 
+        link.keyWord = "No You Cant get it this way..."
 
-        const session = await getServerSession(authOptions);
-        const user = session?.user;
-
-        if (!user) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
-
-        const dbUser = await UserModel.findOne({ email: user?.email });
-
-        if (!dbUser) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
-
-        if (link.viewType === 'private' && link.userId == dbUser._id.toString()){
-            return NextResponse.json(link);
-        }
-
-        return NextResponse.json({error: "This Link is Private."}, {status: 401 })
-
-    
+        return NextResponse.json(link)
 
     } catch (error) {
         console.error("ERROR in GET /api/links", error);
@@ -58,24 +34,10 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
     await dbConnect();
 
-    // Ensure the user is authenticated
-    const session = await getServerSession(authOptions);
-    const user = session?.user;
-
-    if (!user) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const dbUser = await UserModel.findOne({ email: user?.email });
-
-    if (!dbUser) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     try {
         const body = await request.json();
-        const { urls,title, slug, description, viewType } = body;
-
+        const { urls,title, slug, description, keyWord } = body;
+        console.log(urls, title, slug, description, keyWord);
         if (!urls || !slug) {
             return NextResponse.json({ error: "URLs and slug are required" }, { status: 400 });
         }
@@ -85,8 +47,7 @@ export async function POST(request: Request) {
             urls,
             slug,
             title,
-            userId: dbUser._id,
-            viewType,
+            keyWord,
             description: description || "",
         });
 
@@ -103,29 +64,16 @@ export async function POST(request: Request) {
 export async function DELETE(request: Request) {
     await dbConnect();
 
-    // Ensure the user is authenticated
-    const session = await getServerSession(authOptions);
-    const user = session?.user;
-    if (!user) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const dbUser = await UserModel.findOne({ email: user?.email });
-
-    if (!dbUser) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     try {
         const body = await request.json();
-        const { slug } = body;
+        const { slug, keyWord } = body;
 
         if (!slug) {
             return NextResponse.json({ error: "Slug is required" }, { status: 400 });
         }
 
-        // Find and delete the link by slug
-        const deletedLink = await LinkModel.findOneAndDelete({ slug , userId: dbUser._id });
+        // Find and delete the link by slug and keyWord
+        const deletedLink = await LinkModel.findOneAndDelete({ slug, keyWord });
 
         if (!deletedLink) {
             return NextResponse.json({ error: "Link not found" }, { status: 404 });
@@ -140,39 +88,48 @@ export async function DELETE(request: Request) {
 }
 
 export async function PUT(request: Request) {
-    // Ensure the user is authenticated
     await dbConnect();
-
-    const session = await getServerSession(authOptions);
-    const user = session?.user;
-
-    if (!user) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const dbUser = await UserModel.findOne({ email: user?.email });
-
-    if (!dbUser) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
 
     try {
         const body = await request.json();
-        const { slug, urls, description, viewType } = body;
+        const { slug, urls, description, keyWord, title, key, originalSlug } = body;
 
-        if (!slug || !urls) {
-            return NextResponse.json({ error: "Slug and URLs are required" }, { status: 400 });
+        if (!originalSlug || !urls || !key) {
+            return NextResponse.json({ error: "Original slug, URLs, and authorization key are required" }, { status: 400 });
         }
 
-        // Find the link by slug and update it
+        // First verify authorization
+        const existingLink = await LinkModel.findOne({ slug: originalSlug, keyWord: key });
+        if (!existingLink) {
+            return NextResponse.json({ error: "Unauthorized or link not found" }, { status: 401 });
+        }
+
+        // Update the link
+        const updateData: any = {
+            urls,
+            description: description || "",
+            keyWord,
+            title: title || existingLink.title
+        };
+
+        // Only update slug if it's different from original
+        if (slug && slug !== originalSlug) {
+            // Check if new slug is available
+            const existingSlugLink = await LinkModel.findOne({ slug });
+            if (existingSlugLink) {
+                return NextResponse.json({ error: "Slug already exists" }, { status: 409 });
+            }
+            updateData.slug = slug;
+        }
+
         const updatedLink = await LinkModel.findOneAndUpdate(
-            { slug, userId: dbUser._id },
-            { urls, description, viewType },
+            { slug: originalSlug, keyWord: key },
+            updateData,
             { new: true }
         );
 
         if (!updatedLink) {
-            return NextResponse.json({ error: "Link not found" }, { status: 404 });
+            return NextResponse.json({ error: "Failed to update link" }, { status: 404 });
         }
 
         return NextResponse.json(updatedLink);

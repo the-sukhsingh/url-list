@@ -1,10 +1,8 @@
 import { motion, AnimatePresence } from 'motion/react'
 import React, { useState } from 'react'
-import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 
 const Hero = () => {
-  const { status } = useSession();
   const [isHovered, setIsHovered] = useState(false);
 
   const cardVariant = {
@@ -63,15 +61,11 @@ const Hero = () => {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden select-none">
       {/* Grid Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100">
+      <div className="absolute inset-0 ">
         <div 
-          className="absolute inset-0 opacity-30"
+          className="absolute inset-0 opacity-30 bg-grid-dark dark:bg-grid-light"
           style={{
-            backgroundImage: `
-              linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px)
-            `,
-            backgroundSize: '20px 20px'
+            backgroundSize: '30px 30px'
           }}
         />
       </div>
@@ -85,7 +79,7 @@ const Hero = () => {
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <div className="bg-white rounded-3xl shadow-xl border border-gray-200 p-12 max-w-2xl mx-auto relative overflow-hidden">
+        <div className="bg-white dark:bg-neutral-900 rounded-3xl shadow-xl border border-gray-200 p-12 max-w-2xl mx-auto relative overflow-hidden">
           {/* Decorative elements */}
           <div className="absolute top-4 left-4 w-3 h-3 bg-red-400 rounded-full"></div>
           <div className="absolute top-4 left-12 w-3 h-3 bg-yellow-400 rounded-full"></div>
@@ -99,10 +93,10 @@ const Hero = () => {
               animate={isHovered ? "blurred" : "normal"}
               className="relative"
             >
-              <h1 className="text-5xl md:text-7xl font-bold text-gray-900 leading-tight">
+              <h1 className="text-5xl md:text-7xl font-bold text-neutral-900 dark:text-neutral-200 leading-tight">
                 Share Many Links
                 <br />
-                <span className="text-gray-600">In One Link</span>
+                <span className="text-neutral-600 dark:text-neutral-300">In One Link</span>
               </h1>
             </motion.div>
 
@@ -116,11 +110,11 @@ const Hero = () => {
                   exit="hidden"
                   className="absolute inset-0 flex items-center justify-center"
                 >
-                  <Link href={status === 'authenticated' ? '/dashboard' : '/sign-up'}>
+                  <Link href="/build">
                     <motion.button
                       whileHover={{ scale: 1 }}
                       whileTap={{ scale: 0.95 }}
-                      className="bg-black text-white px-8 py-4 rounded-full font-semibold text-lg shadow-lg hover:shadow-xl transition-shadow cursor-pointer"
+                      className="bg-black dark:bg-neutral-200 text-white dark:text-neutral-800 px-8 py-4 rounded-full font-semibold text-lg shadow-lg hover:shadow-xl transition-shadow cursor-pointer"
                     >
                       Get Started
                     </motion.button>
@@ -131,7 +125,7 @@ const Hero = () => {
           </div>
 
           {/* Subtle gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-transparent to-blue-50 opacity-30 rounded-3xl pointer-events-none"></div>
+          <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-transparent to-blue-50 dark:to-blue-950 opacity-30 rounded-3xl pointer-events-none"></div>
         </div>
 
         {/* Floating elements */}
