@@ -119,7 +119,7 @@ const BuildPage = () => {
         throw new Error(errorData.message || 'Failed to create link collection.');
       }
 
-      router.push(`/link/edit/${createForm.slug}`);
+      router.push(`/${createForm.slug}`);
     } catch (err: any) {
       setSubmitError(err.message || 'An unexpected error occurred. Please try again.');
       console.error('Error creating link:', err);
