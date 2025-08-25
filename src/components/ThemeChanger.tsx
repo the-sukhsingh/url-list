@@ -20,7 +20,7 @@ export function ToggleTheme() {
     }, [resolvedTheme, setTheme]);
 
     return (
-        <button onClick={handleToggle} className="absolute top-4 right-4 z-50">
+        <button onClick={handleToggle} className="absolute top-4 right-4 z-50 hidden lg:block">
             <MoonStarIcon className="hidden [html.dark_&]:block" />
             <SunIcon className="hidden [html.light_&]:block" />
             <span className="sr-only">Toggle Theme</span>

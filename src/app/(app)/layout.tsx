@@ -8,7 +8,7 @@ export default function RootLayout({
     return (
         <>
         <div className="relative">
-            <main>
+            <main className="px-2 md:p-0">
                 {children}
             </main>
         </div>

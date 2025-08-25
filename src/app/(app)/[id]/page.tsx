@@ -143,7 +143,7 @@ const LinkPage = () => {
       <div className=' min-h-screen w-full font-sans flex flex-col  justify-start items-center pt-3 overflow-hidden'>
         {/* Header */}
         <div className='screen-line-after screen-line-before p-2 w-full text-3xl font-semibold max-w-4xl border-x border-edge'>
-          {link.title || link.slug}
+          {link.title?.slice(0,16) + (link.title && link.title?.length > 16 ? "..." : "") }
           <div className='absolute inset-y-0 right-0 flex items-center'>
 
             <motion.button
