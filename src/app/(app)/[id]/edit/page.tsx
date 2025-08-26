@@ -2,9 +2,9 @@
 import React, { useEffect, useState } from 'react'
 import { motion } from "framer-motion"
 import { useParams, useRouter } from 'next/navigation'
-import { FiTag } from 'react-icons/fi'
+import { FiTag, FiTrash, FiTrash2 } from 'react-icons/fi'
 import { Viewer } from '@/components/Viewer'
-import { CircleCheckIcon, CircleXIcon, LoaderPinwheelIcon, X } from 'lucide-react'
+import { LoaderPinwheelIcon, X } from 'lucide-react'
 
 import Authorization from '@/components/Authorization'
 import { useDebounceCallback } from 'usehooks-ts'
@@ -109,6 +109,27 @@ const EditPage = () => {
             console.error('Authorization error:', error);
         } finally {
             setIsCheckingAuth(false);
+        }
+    };
+
+    const handleDelete = async () => {
+        if (confirm("Are you sure you want to delete this collection?")) {
+            try {
+                const response = await fetch(`/api/links`, {
+                    method: 'DELETE',
+                    body: JSON.stringify({ keyWord: authKey, slug: id }),
+                });
+
+                if (response.ok) {
+                    router.push('/build');
+                } else {
+                    const errorData = await response.json();
+                    setSubmitError(errorData.message || 'Failed to delete collection');
+                }
+            } catch (error) {
+                setSubmitError('Failed to delete collection. Please try again.');
+                console.error('Delete error:', error);
+            }
         }
     };
 
@@ -236,7 +257,7 @@ const EditPage = () => {
             <div className='screen-line-after bg-[repeating-linear-gradient(315deg,var(--pattern-foreground)_0,var(--pattern-foreground)_1px,transparent_0,transparent_50%)] bg-size-[10px_10px] [--pattern-foreground:var(--color-edge)]/56 max-w-4xl w-full mx-auto text-center h-5 border-x border-edge'>
             </div>
             {/* Title and Slug */}
-            <div className='border-x screen-line-after border-edge p-1 min-h-full max-w-4xl w-full grid grid-cols-1 md:grid-cols-2 gap-3 relative overflow-hidden'>
+            <div className='border-x screen-line-after border-edge p-1 min-h-full max-w-4xl w-full grid grid-cols-2 gap-3 relative overflow-hidden'>
                 <div className='h-full col-span-1 flex text-neutral-700 dark:text-neutral-50'>
                     <label htmlFor="title">Title *</label>
                 </div>
@@ -245,10 +266,10 @@ const EditPage = () => {
                     <label htmlFor="slug">Slug *</label>
                 </div>
             </div>
-            <div className='border-x screen-line-after border-edge min-h-full max-w-4xl w-full grid grid-cols-1 md:grid-cols-2 gap-3 relative'>
+            <div className='border-x screen-line-after border-edge min-h-full max-w-4xl w-full grid grid-cols-2 gap-3 relative'>
                 <div className='h-full col-span-1  flex text-lg text-neutral-700 dark:text-neutral-50'>
                     <input type="text" id='title' name='title' value={createForm.title} onChange={handleChange} placeholder="e.g., My Design Resources" required
-                        className='w-full h-full p-2 focus:outline-none'
+                        className='w-full h-full p-2 focus:outline-none text-sm md:text-base'
                     />
                 </div>
                 <div className='h-full w-px bg-edge absolute left-0 right-0 mx-auto'></div>
@@ -262,7 +283,7 @@ const EditPage = () => {
             </div>
 
             {/* Description and Keyword */}
-            <div className='border-x screen-line-after border-edge p-1 min-h-full max-w-4xl w-full grid grid-cols-1 md:grid-cols-2 gap-3 relative overflow-hidden'>
+            <div className='border-x screen-line-after border-edge p-1 min-h-full max-w-4xl w-full grid grid-cols-2 gap-3 relative overflow-hidden'>
                 <div className='h-full col-span-1 flex text-neutral-700 dark:text-neutral-50'>
                     <label htmlFor="description">Description</label>
                 </div>
@@ -271,18 +292,18 @@ const EditPage = () => {
                     <label htmlFor="keyword">Key *</label>
                 </div>
             </div>
-            <div className='border-x screen-line-after border-edge min-h-full max-w-4xl w-full grid grid-cols-1 md:grid-cols-2 gap-3 relative'>
+            <div className='border-x screen-line-after border-edge min-h-full max-w-4xl w-full grid grid-cols-2 gap-3 relative'>
                 <div className='h-full col-span-1  flex text-lg text-neutral-700 dark:text-neutral-50'>
                     <textarea
                         rows={1}
                         id='description' value={createForm.description} name='description' onChange={handleChange} placeholder="e.g., A collection of my favorite design resources" required
-                        className='w-full h-full p-2 focus:outline-none'
+                        className='w-full h-full p-2 focus:outline-none text-sm md:text-base'
                     />
                 </div>
                 <div className='h-full w-px bg-edge absolute left-0 right-0 mx-auto'></div>
                 <div className='h-full col-span-1 flex text-lg text-neutral-700 dark:text-neutral-50'>
                     <input type="password" id='keyword' minLength={5} maxLength={12} value={createForm.keyWord} name='keyWord' onChange={handleChange} placeholder="e.g., mysecretkeyword" required
-                        className='w-full h-full p-2 focus:outline-none'
+                        className='w-full h-full p-2 focus:outline-none text-sm md:text-base'
                     />
                 </div>
             </div>
@@ -330,7 +351,7 @@ const EditPage = () => {
                             type="button"
                             whileHover={{ scale: 1.1, rotate: 5 }} whileTap={{ scale: 0.9 }}
                             onClick={() => handleRemoveLink(index)}
-                            className="opacity-0 group-hover:opacity-100 cursor-pointer p-3 absolute -top-2 -right-10 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
+                            className="md:opacity-0 md:group-hover:opacity-100 cursor-pointer p-3 absolute top-2 right-2 md:-top-2 md:-right-10 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
                             aria-label="Remove link"
                         >
                             <X size={25} />
@@ -338,7 +359,8 @@ const EditPage = () => {
                     </div>
                 ))
             }
-            <div className="absolute bottom-3 right-3 w-full flex justify-end">
+            <div className='h-16'></div>
+            <div className="absolute bottom-3 md:right-3 w-full flex justify-center md:justify-end gap-2">
                 {submitError && (
                     <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded-md z-50">
                         {submitError}
@@ -347,7 +369,15 @@ const EditPage = () => {
                 <motion.button
                     whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
                     type="submit"
-                    className='btn btn-ghost rounded-lg'
+                    className='btn btn-error text-foreground rounded-lg'
+                    onClick={handleDelete}
+                >
+                    <FiTrash2 size={25} /> Delete Collection
+                </motion.button>
+                <motion.button
+                    whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                    type="submit"
+                    className='btn rounded-lg'
                     onClick={handleUpdateCollection}
                     disabled={isSubmitting || !createForm.keyWord || !createForm.title || !createForm.slug || !createForm.urls.length}
                 >
@@ -360,7 +390,7 @@ const EditPage = () => {
             </div>
 
         </div>
-        <Footer showBuild={true} />
+        <Footer showBuild={false} />
     </>
     )
 }

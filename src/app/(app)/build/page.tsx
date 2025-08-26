@@ -184,7 +184,7 @@ const BuildPage = () => {
       <div className='screen-line-after bg-[repeating-linear-gradient(315deg,var(--pattern-foreground)_0,var(--pattern-foreground)_1px,transparent_0,transparent_50%)] bg-size-[10px_10px] [--pattern-foreground:var(--color-edge)]/56 max-w-4xl w-full mx-auto text-center h-5 border-x border-edge'>
       </div>
       {/* Title and Slug */}
-      <div className='border-x screen-line-after border-edge p-1 min-h-full max-w-4xl w-full grid grid-cols-1 md:grid-cols-2 gap-3 relative overflow-hidden'>
+      <div className='border-x screen-line-after border-edge p-1 min-h-full max-w-4xl w-full grid grid-cols-2 gap-3 relative overflow-hidden'>
         <div className='h-full col-span-1 flex text-neutral-700 dark:text-neutral-50'>
           <label htmlFor="title">Title *</label>
         </div>
@@ -193,10 +193,10 @@ const BuildPage = () => {
           <label htmlFor="slug">Slug *</label>
         </div>
       </div>
-      <div className='border-x screen-line-after border-edge min-h-full max-w-4xl w-full grid grid-cols-1 md:grid-cols-2 gap-3 relative'>
-        <div className='h-full col-span-1  flex text-lg text-neutral-700 dark:text-neutral-50'>
+      <div className='border-x screen-line-after border-edge min-h-full max-w-4xl w-full grid grid-cols-2 gap-3 relative'>
+        <div className='h-full col-span-1 flex text-lg text-neutral-700 dark:text-neutral-50'>
           <input type="text" id='title' name='title' value={createForm.title} onChange={handleChange} placeholder="e.g., My Design Resources" required
-            className='w-full h-full p-2 focus:outline-none'
+            className='w-full h-full p-2 focus:outline-none text-sm md:text-base'
           />
         </div>
         <div className='h-full w-px bg-edge absolute left-0 right-0 mx-auto'></div>
@@ -206,7 +206,7 @@ const BuildPage = () => {
             setCreateForm(prev => ({ ...prev, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-_]/g, '') }))
             debouncedSlugCheck(e.target.value)
           }}  placeholder="e.g., my-design" required
-            className='w-full h-full p-2 focus:outline-none'
+            className='w-full h-full p-2 focus:outline-none text-sm md:text-base'
           />
           {createForm.slug && (
 
@@ -229,7 +229,7 @@ const BuildPage = () => {
       </div>
 
       {/* Description and Keyword */}
-      <div className='border-x screen-line-after border-edge p-1 min-h-full max-w-4xl w-full grid grid-cols-1 md:grid-cols-2 gap-3 relative overflow-hidden'>
+      <div className='border-x screen-line-after border-edge p-1 min-h-full max-w-4xl w-full grid grid-cols-2 gap-3 relative overflow-hidden'>
         <div className='h-full col-span-1 flex text-neutral-700 dark:text-neutral-50'>
           <label htmlFor="description">Description</label>
         </div>
@@ -238,18 +238,18 @@ const BuildPage = () => {
           <label htmlFor="keyword">Key *</label>
         </div>
       </div>
-      <div className='border-x screen-line-after border-edge min-h-full max-w-4xl w-full grid grid-cols-1 md:grid-cols-2 gap-3 relative'>
+      <div className='border-x screen-line-after border-edge min-h-full max-w-4xl w-full grid grid-cols-2 gap-3 relative'>
         <div className='h-full col-span-1  flex text-lg text-neutral-700 dark:text-neutral-50'>
           <textarea
             rows={1}
             id='description' value={createForm.description} name='description' onChange={handleChange} placeholder="e.g., A collection of my favorite design resources" required
-            className='w-full h-full p-2 focus:outline-none'
+            className='w-full h-full p-2 focus:outline-none text-sm md:text-base'
           />
         </div>
         <div className='h-full w-px bg-edge absolute left-0 right-0 mx-auto'></div>
         <div className='h-full col-span-1 flex text-lg text-neutral-700 dark:text-neutral-50'>
           <input type="password" id='keyword' minLength={5} maxLength={12} value={createForm.keyWord} name='keyWord' onChange={handleChange} placeholder="e.g., mysecretkeyword" required
-            className='w-full h-full p-2 focus:outline-none'
+            className='w-full h-full p-2 focus:outline-none text-sm md:text-base'
           />
         </div>
       </div>

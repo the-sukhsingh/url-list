@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     title: "URL List - Share Multiple Links with One Short URL",
     description: "URL List helps you share multiple links with one easy-to-remember URL. Create custom slugs for your collection of links.",
     images: ["/og-image.png"],
-    creator: "@thesukhjitbajwa",
+    creator: "@thesukhjitbajwa"
   },
 
 };
