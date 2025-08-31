@@ -28,18 +28,18 @@ const EditPage = () => {
     // --- STATE MANAGEMENT ---
 
     // Authorization state
-    const [slug, setSlug] = useState<string>('');
     const [isAuthorized, setIsAuthorized] = useState(false);
     const [authKey, setAuthKey] = useState<string>('');
     const [authError, setAuthError] = useState<string | null>(null);
     const [isCheckingAuth, setIsCheckingAuth] = useState(false);
+    const [collId, SetCollId] = useState<string | null>(null);
 
     // Single state object for all form data
     const [createForm, setCreateForm] = useState<CreateLinkForm>({
         slug: '',
         title: '',
         description: '',
-        keyWord: '',
+        keyWord: authKey,
         urls: [], // Start with one empty link input
     });
 
@@ -50,37 +50,6 @@ const EditPage = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState<string | null>(null);
 
-
-      const [slugStatus, setSlugStatus] = useState<{
-        isChecking: boolean;
-        message: string;
-        isAvailable: boolean;
-      }>({ isChecking: false, message: '', isAvailable: false });
-    
-
-    // Debounce the slug input to avoid excessive API calls
-    const debouncedSlugCheck = useDebounceCallback(setSlug, 500);
-
-
-    // Effect to trigger the debounced slug check when the slug changes
-
-    useEffect(() => {
-        const checkUsernameUnique = async () => {
-            if (slug.length >= 3) {
-                setSlugStatus({ isChecking: true, message: '', isAvailable: false });
-                try {
-                    const response = await fetch(`/api/check-slug-unique?slug=${slug}`);
-                    const data = await response.json();
-                    setSlugStatus({ isChecking: false, message: data.message, isAvailable: data.success });
-                } catch (error) {
-                    setSlugStatus({ isChecking: false, message: "Error checking username availability", isAvailable: false });
-                }
-            } else {
-                setSlug("");
-            }
-        };
-        checkUsernameUnique();
-    }, [slug]);
     // --- HANDLERS ---
 
     // Authorization handler
@@ -100,7 +69,8 @@ const EditPage = () => {
                 const linkData = await response.json();
                 setIsAuthorized(true);
                 setAuthKey(key);
-                setCreateForm(linkData);
+                setCreateForm({ ...linkData, keyWord: key });
+                SetCollId(linkData._id);
             } else {
                 setAuthError('Invalid authorization key or collection not found');
             }
@@ -160,7 +130,7 @@ const EditPage = () => {
                 body: JSON.stringify({
                     ...createForm,
                     key: authKey,
-                    originalSlug: id
+                    id: collId
                 }),
             });
 
@@ -245,7 +215,6 @@ const EditPage = () => {
 
     return (<>
         <div className=' min-h-screen w-full font-sans flex flex-col relative justify-start items-center pt-3 overflow-hidden'>
-
             {/* Header */}
             <div className='screen-line-after screen-line-before p-2 w-full text-3xl font-semibold max-w-4xl border-x border-edge'>
                 Craft Your Collection

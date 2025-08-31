@@ -6,7 +6,6 @@ export async function GET(request: Request) {
     await dbConnect();
     
     try {
-        
         const { searchParams } = new URL(request.url);
         const slug = searchParams.get("slug");
 
@@ -92,16 +91,21 @@ export async function PUT(request: Request) {
 
     try {
         const body = await request.json();
-        const { slug, urls, description, keyWord, title, key, originalSlug } = body;
-
-        if (!originalSlug || !urls || !key) {
-            return NextResponse.json({ error: "Original slug, URLs, and authorization key are required" }, { status: 400 });
+        const { slug, urls, description, keyWord, title, key, id } = body;
+        console.log(id, key, keyWord)
+        if (!id || !urls || !key) {
+            return NextResponse.json({ error: "ID, URLs, and authorization key are required" }, { status: 400 });
         }
 
-        // First verify authorization
-        const existingLink = await LinkModel.findOne({ slug: originalSlug, keyWord: key });
+        // First verify link exists
+        const existingLink = await LinkModel.findById(id);
         if (!existingLink) {
-            return NextResponse.json({ error: "Unauthorized or link not found" }, { status: 401 });
+            return NextResponse.json({ error: "Link not found" }, { status: 404 });
+        }
+        console.log(existingLink)
+        // Verify authorization
+        if (existingLink.keyWord !== key) {
+            return NextResponse.json({ error: "Unauthorized: incorrect key" }, { status: 401 });
         }
 
         // Update the link
@@ -113,17 +117,17 @@ export async function PUT(request: Request) {
         };
 
         // Only update slug if it's different from original
-        if (slug && slug !== originalSlug) {
+        if (slug && slug !== existingLink.slug) {
             // Check if new slug is available
             const existingSlugLink = await LinkModel.findOne({ slug });
             if (existingSlugLink) {
-                return NextResponse.json({ error: "Slug already exists" }, { status: 409 });
+                return NextResponse.json({ error: "Slug already in use" }, { status: 400 });
             }
             updateData.slug = slug;
         }
 
-        const updatedLink = await LinkModel.findOneAndUpdate(
-            { slug: originalSlug, keyWord: key },
+        const updatedLink = await LinkModel.findByIdAndUpdate(
+            id,
             updateData,
             { new: true }
         );
