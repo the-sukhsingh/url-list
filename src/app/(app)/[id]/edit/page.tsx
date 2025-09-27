@@ -1,13 +1,12 @@
 "use client"
 import React, { useEffect, useState } from 'react'
-import { motion } from "framer-motion"
+import { motion, Reorder } from "motion/react"
 import { useParams, useRouter } from 'next/navigation'
-import { FiTag, FiTrash, FiTrash2 } from 'react-icons/fi'
+import { FiTag, FiTrash2 } from 'react-icons/fi'
 import { Viewer } from '@/components/Viewer'
 import { LoaderPinwheelIcon, X } from 'lucide-react'
 
 import Authorization from '@/components/Authorization'
-import { useDebounceCallback } from 'usehooks-ts'
 import Footer from '@/components/Footer'
 
 // The main data structure for the link collection form
@@ -24,7 +23,6 @@ const EditPage = () => {
 
     const { id } = useParams();
     const router = useRouter();
-
     // --- STATE MANAGEMENT ---
 
     // Authorization state
@@ -311,25 +309,43 @@ const EditPage = () => {
             </div>
             <div className='screen-line-after bg-[repeating-linear-gradient(315deg,var(--pattern-foreground)_0,var(--pattern-foreground)_1px,transparent_0,transparent_50%)] bg-size-[10px_10px] [--pattern-foreground:var(--color-edge)]/56 max-w-4xl w-full mx-auto text-center h-5 border-x border-edge'>
             </div>
+            <Reorder.Group
+                axis="y"
+                values={createForm.urls}
+                onReorder={(urls) => setCreateForm(prev => ({ ...prev, urls }))}
+                className='flex flex-col w-full items-center'
+            >
+                {
+                    createForm.urls && createForm.urls.map((link, index) => {
 
-            {
-                createForm.urls && createForm.urls.map((link, index) => (
-                    <div key={index} className='group screen-line-after min-h-full max-w-4xl w-full gap-3 relative'>
-                        <Viewer url={link} />
-                        <motion.button
-                            type="button"
-                            whileHover={{ scale: 1.1, rotate: 5 }} whileTap={{ scale: 0.9 }}
-                            onClick={() => handleRemoveLink(index)}
-                            className="md:opacity-0 md:group-hover:opacity-100 cursor-pointer p-3 absolute top-2 right-2 md:-top-2 md:-right-10 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
-                            aria-label="Remove link"
-                        >
-                            <X size={25} />
-                        </motion.button>
-                    </div>
-                ))
-            }
-            <div className='h-16'></div>
-            <div className="absolute bottom-3 md:right-3 w-full flex justify-center md:justify-end gap-2">
+                        return (
+                            <Reorder.Item
+                                value={link}
+                                key={link}
+                                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                className='group screen-line-after min-h-full max-w-4xl w-full gap-3 relative cursor-grab active:cursor-grabbing'
+                            >
+                                <div className='relative w-full h-full pointer-events-none'>
+
+                                <Viewer url={link} />
+                                    </div>
+                                <motion.button
+                                    type="button"
+                                    whileHover={{ scale: 1.1, rotate: 5 }} whileTap={{ scale: 0.9 }}
+                                    onClick={() => handleRemoveLink(index)}
+                                    className="opacity-0 group-hover:opacity-100 cursor-pointer p-3 absolute -top-2 -right-10 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
+                                    aria-label="Remove link"
+                                    >
+                                    <X size={25} />
+                                </motion.button>
+
+                            </Reorder.Item>
+                        )
+                    })
+                }
+            </Reorder.Group>
+
+            <div className="w-full max-w-4xl screen-line-after border-x border-edge flex justify-center lg:justify-end overflow-hidden">
                 {submitError && (
                     <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded-md z-50">
                         {submitError}
@@ -338,22 +354,22 @@ const EditPage = () => {
                 <motion.button
                     whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
                     type="submit"
-                    className='btn btn-error text-foreground rounded-lg'
+                    className='btn btn-error text-foreground'
                     onClick={handleDelete}
                 >
-                    <FiTrash2 size={25} /> Delete Collection
+                    <FiTrash2 size={20} /> Delete Collection
                 </motion.button>
                 <motion.button
                     whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
                     type="submit"
-                    className='btn rounded-lg'
+                    className='btn'
                     onClick={handleUpdateCollection}
                     disabled={isSubmitting || !createForm.keyWord || !createForm.title || !createForm.slug || !createForm.urls.length}
                 >
                     {isSubmitting ? (
-                        <> <LoaderPinwheelIcon className="animate-spin" /> Updating... </>
+                        <> <LoaderPinwheelIcon size={20} className="animate-spin" /> Updating... </>
                     ) : (
-                        <> <FiTag /> Update Collection </>
+                        <> <FiTag size={20} /> Update Collection </>
                     )}
                 </motion.button>
             </div>

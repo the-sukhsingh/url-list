@@ -24,7 +24,7 @@ const Hero = () => {
 
   const textVariant = {
     normal: {
-      filter: "blur(0px)",
+      // filter: "blur(0px)",
       scale: 1,
       transition: {
         duration: 0.3,
@@ -32,7 +32,8 @@ const Hero = () => {
       },
     },
     blurred: {
-      filter: "blur(4px)",
+      // filter: "blur(4px)",
+      
       scale: 0.95,
       transition: {
         duration: 0.3,
@@ -108,7 +109,7 @@ const Hero = () => {
                   initial="hidden"
                   animate="visible"
                   exit="hidden"
-                  className="absolute inset-0 flex items-center justify-center"
+                  className="absolute -inset-4 flex items-center justify-center backdrop-blur-sm"
                 >
                   <Link href="/build">
                     <motion.button

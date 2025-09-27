@@ -92,7 +92,6 @@ export async function PUT(request: Request) {
     try {
         const body = await request.json();
         const { slug, urls, description, keyWord, title, key, id } = body;
-        console.log(id, key, keyWord)
         if (!id || !urls || !key) {
             return NextResponse.json({ error: "ID, URLs, and authorization key are required" }, { status: 400 });
         }

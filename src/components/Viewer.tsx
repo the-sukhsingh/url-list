@@ -193,15 +193,8 @@ export const Viewer = ({ url, className = '' }: UrlPreviewProps) => {
             href={url}
             target="_blank"
             rel="noopener noreferrer"
-            className={`group relative block w-full border-x border-edge p-3 transition-all duration-300 ${className}`}
+            className={`group relative block w-full border-x border-edge p-3 transition-all duration-300 backdrop-blur-md ${className}`}
         >
-            {/* Decorative corner elements */}
-            {/* <div className="absolute top-3 left-3 w-2 h-2 bg-blue-400 rounded-full opacity-60"></div>
-            <div className="absolute top-3 right-3 w-2 h-2 bg-purple-400 rounded-full opacity-60"></div> */}
-
-            {/* Glowing effect on hover */}
-            {/* <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-purple-500/5 to-pink-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div> */}
-
             <div className="relative">
                 {/* Header Section */}
                 <div className="flex items-center justify-between mb-4">
@@ -236,10 +229,10 @@ export const Viewer = ({ url, className = '' }: UrlPreviewProps) => {
                         </motion.div>
 
                         <div className="min-w-0 flex-1">
-                            <div className="relative">
+                            <div className="">
                                 <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-50 overflow-visible leading-tight line-clamp-2 transition-colors" dangerouslySetInnerHTML={{ __html: metadata.title || 'Untitled Link' }}>
                                 </h3>
-                                <div className="h-px bg-neutral-800 dark:bg-neutral-300 mt-1 w-0 group-hover:w-full transition-all duration-300 ease-out"></div>
+                                <div className="h-px bg-neutral-800 dark:bg-neutral-300 mt-1 w-full scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-in-out origin-right group-hover:origin-left transform"></div>
                             </div>
                             <p className="text-xs text-neutral-600 dark:text-neutral-200 truncate">
                                 {metadata.domain}
@@ -261,11 +254,11 @@ export const Viewer = ({ url, className = '' }: UrlPreviewProps) => {
                 </div>
 
                 {/* Tags/Info Section */}
-                <div className="flex absolute bottom-0 right-0">
+                <div className="flex absolute top-0 right-0">
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="text-xs text-neutral-500 dark:text-neutral-200 group-hover:text-neutral-600 group-hover:dark:text-neutral-400 transition-colors"
+                        className="text-xs text-neutral-500 dark:text-neutral-200 group-hover:text-neutral-600 group-hover:dark:text-neutral-400 bg-muted/5 p-1 rounded-md backdrop-blur-sm transition-colors"
                     >
                         Click to visit →
                     </motion.div>

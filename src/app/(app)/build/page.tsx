@@ -1,11 +1,12 @@
 "use client"
 import React, { useEffect, useState } from 'react'
-import { motion, AnimatePresence } from "framer-motion"
+import { motion, Reorder, useDragControls } from 'motion/react'
+
 import { useDebounceCallback } from 'usehooks-ts'
 import { useRouter } from 'next/navigation'
 import { FiTag } from 'react-icons/fi'
 import { Viewer } from '@/components/Viewer'
-import { CircleCheckIcon,  CircleXIcon, LoaderPinwheelIcon, X } from 'lucide-react'
+import { CircleCheckIcon, CircleXIcon, Grip, LoaderPinwheelIcon, X } from 'lucide-react'
 import Footer from '@/components/Footer'
 
 // The main data structure for the link collection form
@@ -20,7 +21,7 @@ export interface CreateLinkForm {
 
 const BuildPage = () => {
   const router = useRouter();
-
+  const controls = useDragControls()
   // --- STATE MANAGEMENT ---
 
   // Single state object for all form data
@@ -69,6 +70,10 @@ const BuildPage = () => {
     checkUsernameUnique();
   }, [slug]);
 
+  const reorderLinks = (newOrder: string[]) => {
+    setCreateForm(prev => ({ ...prev, links: newOrder }));
+  }
+
 
   // --- HANDLERS ---
 
@@ -90,7 +95,7 @@ const BuildPage = () => {
     setIsSubmitting(true);
     setSubmitError(null);
 
-    console.log("createform",createForm)
+    console.log("createform", createForm)
 
     // --- Validation ---
     if (!slugStatus.isAvailable) {
@@ -205,24 +210,24 @@ const BuildPage = () => {
           <input type="text" id='slug' name='slug' value={createForm.slug} onChange={(e) => {
             setCreateForm(prev => ({ ...prev, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-_]/g, '') }))
             debouncedSlugCheck(e.target.value)
-          }}  placeholder="e.g., my-design" required
+          }} placeholder="e.g., my-design" required
             className='w-full h-full p-2 focus:outline-none text-sm md:text-base'
           />
           {createForm.slug && (
 
-          <div className='absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-2'>
-          {
-            slugStatus.isAvailable ? (
-              <CircleCheckIcon size={20} className='text-green-500' />
-            ) : slugStatus.isChecking ? (
-              <LoaderPinwheelIcon size={20} className='text-yellow-500 animate-spin' />
-            ) : (
-              <CircleXIcon size={20} className='text-red-500' />
-            )
-          }
-        </div>
+            <div className='absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-2'>
+              {
+                slugStatus.isAvailable ? (
+                  <CircleCheckIcon size={20} className='text-green-500' />
+                ) : slugStatus.isChecking ? (
+                  <LoaderPinwheelIcon size={20} className='text-yellow-500 animate-spin' />
+                ) : (
+                  <CircleXIcon size={20} className='text-red-500' />
+                )
+              }
+            </div>
           )}
-      </div>
+        </div>
       </div>
 
       <div className='screen-line-after bg-[repeating-linear-gradient(315deg,var(--pattern-foreground)_0,var(--pattern-foreground)_1px,transparent_0,transparent_50%)] bg-size-[10px_10px] [--pattern-foreground:var(--color-edge)]/56 max-w-4xl w-full mx-auto text-center h-5 border-x border-edge'>
@@ -279,8 +284,8 @@ const BuildPage = () => {
               setCurrLink('');
             }
           }}
-          disabled={isSubmitting || !(currLink.trim().length > 10)}
-          className='btn btn-ghost rounded-xl'
+            disabled={isSubmitting || !(currLink.trim().length > 10)}
+            className='btn btn-ghost rounded-xl'
           >
             Add
           </button>
@@ -288,30 +293,47 @@ const BuildPage = () => {
       </div>
       <div className='screen-line-after bg-[repeating-linear-gradient(315deg,var(--pattern-foreground)_0,var(--pattern-foreground)_1px,transparent_0,transparent_50%)] bg-size-[10px_10px] [--pattern-foreground:var(--color-edge)]/56 max-w-4xl w-full mx-auto text-center h-5 border-x border-edge'>
       </div>
+      <Reorder.Group
+        axis="y"
+        values={createForm.links}
+        onReorder={(reorderLinks) => { setCreateForm(prev => ({ ...prev, links: reorderLinks })) }}
+        className='flex flex-col w-full items-center'
+      >
 
-      {
-        createForm.links && createForm.links.map((link, index) =>(
-          <div key={index} className='group screen-line-after min-h-full max-w-4xl w-full gap-3 relative'>
-            <Viewer url={link} />
-            <motion.button
-              type="button"
-              whileHover={{ scale: 1.1, rotate: 5 }} whileTap={{ scale: 0.9 }}
-              onClick={() => handleRemoveLink(index)}
-              className="opacity-0 group-hover:opacity-100 cursor-pointer p-3 absolute -top-2 -right-10 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
-              aria-label="Remove link"
-            >
-              <X size={25} />
-            </motion.button>
-          </div>
+
+        {createForm.links && createForm.links.map((link, index) => (
+          <Reorder.Item
+            value={link}
+            key={link}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            className='group screen-line-after min-h-full max-w-4xl w-full gap-3 relative cursor-grab active:cursor-grabbing'>            
+            <div className='relative w-full h-full pointer-events-none'>
+
+              <Viewer url={link} />
+            </div>
+              <motion.button
+                type="button"
+                whileHover={{ scale: 1.1, rotate: 5 }} whileTap={{ scale: 0.9 }}
+                onClick={() => handleRemoveLink(index)}
+                className="opacity-0 group-hover:opacity-100 cursor-pointer p-3 absolute -top-2 -right-10 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
+                aria-label="Remove link"
+              >
+                <X size={25} />
+              </motion.button>
+          </Reorder.Item>
         ))
+        }
+      </Reorder.Group>
+      {
+        createForm.links.length > 0 && (<div className='screen-line-after bg-[repeating-linear-gradient(315deg,var(--pattern-foreground)_0,var(--pattern-foreground)_1px,transparent_0,transparent_50%)] bg-size-[10px_10px] [--pattern-foreground:var(--color-edge)]/56 max-w-4xl w-full mx-auto text-center h-5 border-x border-edge'>
+        </div>)
       }
-      <div className="absolute bottom-3 right-3 w-full flex justify-end">
-        <motion.button
-          whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+      <div className="w-full max-w-4xl screen-line-after border-x border-edge flex justify-end overflow-hidden">
+        <motion.button whileTap={{ scale: 0.98 }}
           type="submit"
-          className='btn btn-ghost rounded-lg'
+          className='btn btn-ghost rounded-none disabled:opacity-50 disabled:text-foreground disabled:cursor-not-allowed'
           onClick={handleCreateLink}
-          disabled={isSubmitting || !createForm.keyWord || !createForm.title || !createForm.slug || !createForm.links || !slugStatus.isAvailable} 
+          disabled={isSubmitting || !createForm.keyWord || !createForm.title || !createForm.slug || !createForm.links || !slugStatus.isAvailable}
         >
           {isSubmitting ? (
             <> <LoaderPinwheelIcon className="animate-spin" /> Creating... </>
